@@ -140,5 +140,26 @@ namespace EbookWebAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("Edit")]
+        public async Task<ActionResult> EditEBook(AddEBookDTO obj)
+        {
+            try
+            {
+                var mapping = _mapper.Map<LinkEbook>(obj);
+                var edit = await _ebook.UpdateEbook(mapping);
+                var ebook = _mapper.Map<ReadSingleEBookDTO>(edit);
+                if (edit != null)
+                {
+                    ebook.IsSucceeded = true;
+                    ebook.Message = "Edit Data E-Book Berhasil";
+                }
+                return Ok(ebook);
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
     }
 }

@@ -12,6 +12,7 @@ namespace EbookWebAPI.DAL
         Task<IEnumerable<LinkEbook>> GetAllOrderBySKU();
         Task<LinkEbook> DisableLinkEBook(int sku);
         Task<LinkEbook> EnableLinkEBook(int sku);
+        Task<LinkEbook> UpdateEbook(LinkEbook linkEbook);
 
     }
 
@@ -105,8 +106,7 @@ namespace EbookWebAPI.DAL
             catch (Exception ex)
             {
                 throw new Exception(ex.Message );
-            }
-            
+            }            
         }
         public async Task<LinkEbook> DisableLinkEBook(int sku)
         {
@@ -136,6 +136,23 @@ namespace EbookWebAPI.DAL
             catch (Exception ex)
             {
                 throw new Exception($"{ex.Message}");
+            }
+        }
+        public async Task<LinkEbook> UpdateEbook(LinkEbook linkEbook)
+        {
+            try
+            {
+                var edit = await _context.LinkEbooks.FirstOrDefaultAsync(c => c.SKU == linkEbook.SKU && linkEbook.RowStatus == 0);
+                if (edit == null)
+                    throw new Exception($"Error: Data Tidak ditemukan");
+                if (!string.IsNullOrEmpty(linkEbook.BookName)) edit.BookName = linkEbook.BookName;
+                if (!string.IsNullOrEmpty(linkEbook.Link)) edit.Link = linkEbook.Link;
+                await _context.SaveChangesAsync();
+                return edit;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
 
