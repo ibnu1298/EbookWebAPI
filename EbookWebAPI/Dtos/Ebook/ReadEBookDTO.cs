@@ -1,4 +1,6 @@
-﻿namespace EbookWebAPI.Dtos.Ebook
+﻿using EbookWebAPI.Models;
+
+namespace EbookWebAPI.Dtos.Ebook
 {
     public class ReadMultipleEBookDTO : BaseResponse
     {
@@ -18,9 +20,28 @@
         public string BookName { get; set; }
         public string Link { get; set; }
     }
+    public class ReadMultipleSKU : BaseResponse
+    {
+        public List<ReadSKU> Data { get; set; }
+    }
     public class ReadSKU
     {
         public int SKU { get; set; }
     }
+    public class GetEBookBySKU
+    {
+        public int Id { get; set; }
+        public int SKU { get; set; }
+        public string BookName { get; set; }
+        public string Link { get; set; }
+        public GetEBookBySKU(LinkEbook ebook)
+        {
+            Id = ebook.Id;
+            SKU = ebook.SKU;
+            BookName = ebook.BookName;
+            Link = ebook.Link;
+        }
+    }
+
 
 }

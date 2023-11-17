@@ -2,6 +2,8 @@
 using EbookWebAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EbookWebAPI.DAL
 {
@@ -13,6 +15,7 @@ namespace EbookWebAPI.DAL
         Task<LinkEbook> DisableLinkEBook(int sku);
         Task<LinkEbook> EnableLinkEBook(int sku);
         Task<LinkEbook> UpdateEbook(LinkEbook linkEbook);
+        Task<List<LinkEbook>> GetsBySKU(ReadSKU[] obj);
 
     }
 
@@ -149,6 +152,27 @@ namespace EbookWebAPI.DAL
                 if (!string.IsNullOrEmpty(linkEbook.Link)) edit.Link = linkEbook.Link;
                 await _context.SaveChangesAsync();
                 return edit;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<List<LinkEbook>> GetsBySKU(ReadSKU[] obj)
+        {
+            try
+            {
+                List <LinkEbook> eBooks = new List<LinkEbook>();
+                foreach (var item in obj)
+                {
+                    var result = await _context.LinkEbooks.FirstOrDefaultAsync(x => x.SKU == item.SKU && x.RowStatus == 0);
+                    if (result != null)
+                    {
+                        if (eBooks.Contains(eBooks.FirstOrDefault(x => x.SKU == item.SKU))) eBooks.Remove(result);
+                        eBooks.Add(result);                       
+                    }
+                }
+                return eBooks;
             }
             catch (Exception ex)
             {

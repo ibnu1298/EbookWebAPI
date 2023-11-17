@@ -18,6 +18,11 @@ namespace EbookWebAPI.Profiles
 
             CreateMap<ReadMultipleEBookDTO, LinkEbook[]>();
             CreateMap<LinkEbook[], ReadMultipleEBookDTO>();
+
+            CreateMap<ReadSKU[], LinkEbook[]>();
+            CreateMap<LinkEbook[], ReadSKU[]>();
+
+
         }
     }
 }
