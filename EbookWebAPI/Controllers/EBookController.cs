@@ -149,7 +149,7 @@ namespace EbookWebAPI.Controllers
                 if(result != null)
                 {
                     ebook.IsSucceeded = true;
-                    ebook.Message = $"Buku Mengambil {result.Count()} Link E-Book";
+                    ebook.Message = $"Berhasil Mengambil {result.Count()} Link E-Book";
                     ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(result);
                 }
                 return Ok(ebook);
