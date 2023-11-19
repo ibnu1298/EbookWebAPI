@@ -29,6 +29,20 @@ namespace EbookWebAPI.Controllers
         {
             try
             {
+                var checkEmailTo = await _email.CheckFormatEmail(obj.SendTo);
+                if (!checkEmailTo.IsSucceeded) 
+                {
+                    baseResponse.IsSucceeded = checkEmailTo.IsSucceeded;
+                    baseResponse.Message = $"{checkEmailTo.Message}, Email To: {obj.SendTo}";
+                    return BadRequest(baseResponse);
+                }
+                var checkEmailFrom = await _email.CheckFormatEmail(obj.SendFrom);
+                if (!checkEmailFrom.IsSucceeded) 
+                {
+                    baseResponse.IsSucceeded = checkEmailFrom.IsSucceeded;
+                    baseResponse.Message = $"{checkEmailFrom.Message}, Email From: {obj.SendFrom}";
+                    return BadRequest(baseResponse);
+                }
                 var results = await _email.SendEmailAsync(obj);
                 baseResponse.IsSucceeded = results.IsSucceeded;
                 baseResponse.Message = results.Message;

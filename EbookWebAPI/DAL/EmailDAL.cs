@@ -22,6 +22,7 @@ namespace EbookWebAPI.DAL
         Task<EmailCustomer> DisableEmail(string email);
         Task<EmailCustomer> EnableEmail(string email);
         Task<EmailCustomer> UpdateEmail(EmailCustomer linkEbook);
+        Task<BaseResponse> CheckFormatEmail(string email);
 
     }
     public class EmailDAL  : IEMail
@@ -149,6 +150,27 @@ namespace EbookWebAPI.DAL
                     baseResponse.Message = "Email Already Taken";
                     return baseResponse;
                 }
+                if (!email.Contains("@") || !email.Contains("."))
+                {
+                    baseResponse.IsSucceeded = false;
+                    baseResponse.Message = "Incorrect Email Format";
+                    return baseResponse;
+                }
+                baseResponse.IsSucceeded = true;
+                baseResponse.Message = "Email Avaiable";
+                return baseResponse;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<BaseResponse> CheckFormatEmail(string email)
+        {
+            BaseResponse baseResponse = new BaseResponse();
+            try
+            {
+                email = email.ToLower();
                 if (!email.Contains("@") || !email.Contains("."))
                 {
                     baseResponse.IsSucceeded = false;
