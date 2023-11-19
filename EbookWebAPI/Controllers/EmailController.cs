@@ -221,8 +221,9 @@ namespace EbookWebAPI.Controllers
                 else
                 {
                     emails.IsSucceeded = false;
-                    emails.Message = $"Email Belum Terdaftar";
+                    emails.Message = $"Email Not Found";
                     emails.Data = null;
+                    return NotFound(emails);
                 }
                 return Ok(emails);
             }
@@ -271,7 +272,7 @@ namespace EbookWebAPI.Controllers
                     multipleEmailDTO.IsSucceeded = false;
                     multipleEmailDTO.Message = "Tidak Ada Data Duplicate";
                     multipleEmailDTO.Data = null;
-                    return BadRequest(multipleEmailDTO);
+                    return NotFound(multipleEmailDTO);
                 }
                 return Ok(multipleEmailDTO);
             }
