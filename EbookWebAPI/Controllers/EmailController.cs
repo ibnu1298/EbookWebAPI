@@ -24,21 +24,22 @@ namespace EbookWebAPI.Controllers
             _mapper = mapper;
             _context = context;
         }
-        //[HttpPost("SendToEmail-MasihError")]
-        //public async Task<ActionResult> SendEmail(SendEmailDTO sendEmail)
-        //{
-        //    try
-        //    {
-        //        var subject = "Ini Subject";
-        //        var results = _email.SendEmailAsync(sendEmail.SendTo, subject, sendEmail.SKU);
-        //        return Ok(results);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-        
+        [HttpPost("SendToEmail")]
+        public async Task<ActionResult> SendEmail(SendEmailDTO obj)
+        {
+            try
+            {
+                var results = await _email.SendEmailAsync(obj);
+                baseResponse.IsSucceeded = results.IsSucceeded;
+                baseResponse.Message = results.Message;
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("GetAll")]
         public async Task<ActionResult> GetAll()
         {

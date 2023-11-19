@@ -10,7 +10,7 @@ namespace EbookWebAPI.DAL
 {
     public interface IEMail
     {
-        Task SendEmailAsync(string email, string subject, string message);
+        Task<BaseResponse> SendEmailAsync(SendEmailDTO obj);
         Task<EmailCustomer> Insert(CreateEmailDTO obj);
         Task<IEnumerable<EmailCustomer>> InsertBulk(EmailCustomer[] obj);
         Task<IEnumerable<EmailCustomer>> GetAll();
@@ -34,24 +34,36 @@ namespace EbookWebAPI.DAL
             _context = context;
             _mapper = mapper;
         }
-        public Task SendEmailAsync(string email, string subject, string message)
+        public async Task<BaseResponse> SendEmailAsync(SendEmailDTO obj)
         {
-            var emailFrom = "ibnuaqil.albarohin1298@gmail.com";
-            var password = "bypu wvzs vnmm mkjb";
-
-            var client = new SmtpClient("smtp-mail.outlook.com", 587)
+            try
             {
-                EnableSsl = true,
-                Credentials = new NetworkCredential(emailFrom, password)
-            };
+                if(string.IsNullOrEmpty(obj.NameTo)) obj.NameTo = string.Empty;
+                BaseResponse baseResponse= new BaseResponse();
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(obj.SendFrom,obj.NameFrom);
+                mailMessage.Subject = obj.Subject;
+                mailMessage.To.Add(new MailAddress(obj.SendTo,obj.NameTo));
+                mailMessage.Body = obj.BodyHTML;
+                mailMessage.IsBodyHtml = true;
 
-            return client.SendMailAsync(
-                new MailMessage(
-                    from: emailFrom,
-                    to: email,
-                    subject,
-                    message
-                ));
+                var client = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(obj.SendFrom, obj.Password.Replace(" ", ""))
+                };
+                var pass = obj.Password.Replace(" ", "");
+                client.Send(mailMessage);
+                
+                baseResponse.IsSucceeded = true;
+                baseResponse.Message = $"Successfully Sending Email to {obj.SendTo}";
+                return baseResponse;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message); 
+            }
         }
 
         public async Task<IEnumerable<EmailCustomer>> GetAll()

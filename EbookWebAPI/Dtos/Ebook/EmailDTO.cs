@@ -29,7 +29,12 @@ namespace EbookWebAPI.Dtos.Ebook
     }
     public class SendEmailDTO
     {
-        public string SendTo { get; set; }
-        public string SKU { get; set; }
+        public string Subject { get; set; } = string.Empty;
+        public string NameFrom { get; set; } = string.Empty;
+        public string SendFrom { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string? NameTo { get; set; } = string.Empty;
+        public string SendTo { get; set; } = string.Empty;
+        public string BodyHTML { get; set; } = string.Empty;
     }
 }
