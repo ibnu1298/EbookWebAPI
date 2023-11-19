@@ -21,6 +21,9 @@ namespace EbookWebAPI.Profiles
 
             CreateMap<ReadSKU[], LinkEbook[]>();
             CreateMap<LinkEbook[], ReadSKU[]>();
+            
+            CreateMap<AddMultipleSKU, LinkEbook[]>();
+            CreateMap<LinkEbook[], AddMultipleSKU>();
 
 
         }

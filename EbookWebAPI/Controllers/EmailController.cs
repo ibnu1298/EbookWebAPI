@@ -27,8 +27,10 @@ namespace EbookWebAPI.Controllers
         [HttpPost("SendToEmail")]
         public async Task<ActionResult> SendEmail(SendEmailDTO obj)
         {
+            CreateEmailDTO createEmailDTO = new CreateEmailDTO();
             try
             {
+                #region Check Email
                 var checkEmailTo = await _email.CheckFormatEmail(obj.SendTo);
                 if (!checkEmailTo.IsSucceeded) 
                 {
@@ -43,9 +45,24 @@ namespace EbookWebAPI.Controllers
                     baseResponse.Message = $"{checkEmailFrom.Message}, Email From: {obj.SendFrom}";
                     return BadRequest(baseResponse);
                 }
-                var results = await _email.SendEmailAsync(obj);
-                baseResponse.IsSucceeded = results.IsSucceeded;
-                baseResponse.Message = results.Message;
+                #endregion
+                var sendEmail = await _email.SendEmailAsync(obj);
+                #region Register Email
+                var checkEmail = await _email.CheckEmail(obj.SendTo);
+                if (!checkEmail.IsSucceeded && sendEmail.IsSucceeded)
+                {
+                    baseResponse.IsSucceeded = true;
+                    baseResponse.Message = $"{sendEmail.Message}\nRegister Failed: {checkEmail.Message}";
+                }
+                if(checkEmail.IsSucceeded && sendEmail.IsSucceeded)
+                {
+                    createEmailDTO.Email = obj.SendTo;
+                    createEmailDTO.Name = obj.NameTo;
+                    var addEmail = await _email.Insert(createEmailDTO);
+                    baseResponse.IsSucceeded = true;
+                    baseResponse.Message = $"{sendEmail.Message}\nRegister Email Succeeded";
+                }
+                #endregion
                 return Ok(baseResponse);
             }
             catch (Exception ex)
@@ -94,7 +111,7 @@ namespace EbookWebAPI.Controllers
                 if (results != null)
                 {
                     response.IsSucceeded = true;
-                    response.Message = "Email Berhasil ditambahkan";
+                    response.Message = "Email has been successfully registered";
                 }
                 return Ok(response);
             }

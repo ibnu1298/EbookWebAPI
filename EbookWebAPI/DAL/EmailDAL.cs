@@ -37,6 +37,7 @@ namespace EbookWebAPI.DAL
         }
         public async Task<BaseResponse> SendEmailAsync(SendEmailDTO obj)
         {
+            
             try
             {
                 if(string.IsNullOrEmpty(obj.NameTo)) obj.NameTo = string.Empty;
@@ -53,9 +54,10 @@ namespace EbookWebAPI.DAL
                     EnableSsl = true,
                     Credentials = new NetworkCredential(obj.SendFrom, obj.Password.Replace(" ", ""))
                 };
-                var pass = obj.Password.Replace(" ", "");
+
                 client.Send(mailMessage);
                 
+
                 baseResponse.IsSucceeded = true;
                 baseResponse.Message = $"Successfully Sending Email to {obj.SendTo}";
                 return baseResponse;
@@ -147,7 +149,7 @@ namespace EbookWebAPI.DAL
                 if (result != null)
                 {
                     baseResponse.IsSucceeded = false;
-                    baseResponse.Message = "Email Already Taken";
+                    baseResponse.Message = "Email has been registered";
                     return baseResponse;
                 }
                 if (!email.Contains("@") || !email.Contains("."))

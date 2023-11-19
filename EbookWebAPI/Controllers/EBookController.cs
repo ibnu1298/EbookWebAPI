@@ -110,7 +110,7 @@ namespace EbookWebAPI.Controllers
                 if(result != null)
                 {
                     ebook.IsSucceeded = true;
-                    ebook.Message = "Buku Berhasil Didaftarkan";
+                    ebook.Message = "Link E-Book Berhasil Didaftarkan";
                 }
 
                 return Ok(ebook);
@@ -175,7 +175,7 @@ namespace EbookWebAPI.Controllers
                     ebook.IsSucceeded = true;
                     ebook.Message = $"Link E-Book Not Found";
                     ebook.EBooks = null;
-                    return BadRequest(ebook);
+                    return NotFound(ebook);
                 }
                 return Ok(ebook);
             }
@@ -221,7 +221,7 @@ namespace EbookWebAPI.Controllers
                     ebook.IsSucceeded = false;
                     ebook.Message = "Tidak Ada Data Duplicate";
                     ebook.EBooks = null;
-                    return BadRequest(ebook);
+                    return NotFound(ebook);
                 }
                 return Ok(ebook);
             }
