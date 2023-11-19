@@ -22,44 +22,6 @@ namespace EbookWebAPI.Controllers
             _context = context;
         }
         ReadMultipleEBookDTO ebook = new ReadMultipleEBookDTO();
-        [HttpPost("Delete")]
-        public async Task<ActionResult> DisableLink(ReadSKU sku)
-        {
-            try
-            {
-                var results = await _ebook.DisableLinkEBook(sku.SKU);
-                var eBook = _mapper.Map<ReadSingleEBookDTO>(results);
-                if (results != null)
-                {
-                    eBook.IsSucceeded = true;
-                    eBook.Message = "Link has been Successfully Disabled";
-                }
-                return Ok(eBook);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpPost("UnDelete")]
-        public async Task<ActionResult> EnableLink(ReadSKU sku)
-        {
-            try
-            {
-                var results = await _ebook.EnableLinkEBook(sku.SKU);
-                var eBook = _mapper.Map<ReadSingleEBookDTO>(results);
-                if(results != null)
-                {
-                    eBook.IsSucceeded = true;
-                    eBook.Message = "Link has been Successfully Activated";
-                }
-                return Ok(eBook);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
         [HttpGet("OrderByName")]
         public async Task<ActionResult> GetOrderByName()
         {
@@ -99,6 +61,44 @@ namespace EbookWebAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("Disable")]
+        public async Task<ActionResult> DisableLink(ReadSKU sku)
+        {
+            try
+            {
+                var results = await _ebook.DisableLinkEBook(sku.SKU);
+                var eBook = _mapper.Map<ReadSingleEBookDTO>(results);
+                if (results != null)
+                {
+                    eBook.IsSucceeded = true;
+                    eBook.Message = "Link has been Successfully Disabled";
+                }
+                return Ok(eBook);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("Enable")]
+        public async Task<ActionResult> EnableLink(ReadSKU sku)
+        {
+            try
+            {
+                var results = await _ebook.EnableLinkEBook(sku.SKU);
+                var eBook = _mapper.Map<ReadSingleEBookDTO>(results);
+                if(results != null)
+                {
+                    eBook.IsSucceeded = true;
+                    eBook.Message = "Link has been Successfully Activated";
+                }
+                return Ok(eBook);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("AddSingleEBook")]
         public async Task<ActionResult> AddLinkEbook(AddEBookDTO obj)
         {
@@ -126,11 +126,28 @@ namespace EbookWebAPI.Controllers
             try
             {                
                 var data = _mapper.Map<LinkEbook[]>(obj.Data);
+                var dupDisable = await _ebook.CheckDuplicateSKUButDisable(data);
+                if (dupDisable.Count() > 0)
+                {
+                    ebook.IsSucceeded = true;
+                    ebook.Message = $"Insert Failed, {dupDisable.Count()} Link E-Book is registered but disabled";
+                    ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(dupDisable);
+                    return BadRequest(ebook);
+                }
+                var duplicate = await _ebook.CheckDuplicate(data);
+                if (duplicate.Count() > 0)
+                {
+                    ebook.IsSucceeded = true;
+                    ebook.Message = $"Insert Failed, {duplicate.Count()} Link E-Book already registered";
+                    ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(duplicate);
+                    return BadRequest(ebook);
+                }
+                if (duplicate != null) { }
                 var result = await _ebook.InsertMultiple(data);
                 if(result != null)
                 {
                     ebook.IsSucceeded = true;
-                    ebook.Message = "Buku Berhasil Ditambahkan";
+                    ebook.Message = $"{result.Count()} Link E-Book Berhasil Ditambahkan";
                     ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(result);
                 }
                 return Ok(ebook);
@@ -139,18 +156,26 @@ namespace EbookWebAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }[HttpPost("GetMultipleEBookBySKU")]
+        }
+        [HttpPost("GetMultipleEBookBySKU")]
         public async Task<ActionResult> GetMultipleLinkEbookBySKU(ReadSKU[] obj)
         {
             ReadMultipleSKU getSKU = new ReadMultipleSKU();
             try
             {
                 var result = await _ebook.GetsBySKU(obj);
-                if(result != null)
+                if(result.Count() > 0)
                 {
                     ebook.IsSucceeded = true;
                     ebook.Message = $"Berhasil Mengambil {result.Count()} Link E-Book";
                     ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(result);
+                }
+                else
+                {
+                    ebook.IsSucceeded = true;
+                    ebook.Message = $"Link E-Book Not Found";
+                    ebook.EBooks = null;
+                    return BadRequest(ebook);
                 }
                 return Ok(ebook);
             }
@@ -177,7 +202,33 @@ namespace EbookWebAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
+        }
+        [HttpPost("GetAllDuplicate")]
+        public async Task<ActionResult> GetAllDup(AddMultipleEBookDTO obj)
+        {
+            try
+            {
+                var data = _mapper.Map<LinkEbook[]>(obj.Data);
+                var results = await _ebook.CheckDuplicate(data);
+                if (results.Count() > 0)
+                {
+                    ebook.IsSucceeded = true;
+                    ebook.Message = $"Berhasil Mengambil {results.Count()} E-Book Duplicate";
+                    ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(results);
+                }
+                else
+                {
+                    ebook.IsSucceeded = false;
+                    ebook.Message = "Tidak Ada Data Duplicate";
+                    ebook.EBooks = null;
+                    return BadRequest(ebook);
+                }
+                return Ok(ebook);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

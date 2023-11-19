@@ -13,6 +13,7 @@ namespace EbookWebAPI
         }
 
         public DbSet<LinkEbook> LinkEbooks { get; set; }
+        public DbSet<EmailCustomer> EmailCustomers { get; set; }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

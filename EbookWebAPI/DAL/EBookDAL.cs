@@ -16,6 +16,8 @@ namespace EbookWebAPI.DAL
         Task<LinkEbook> EnableLinkEBook(int sku);
         Task<LinkEbook> UpdateEbook(LinkEbook linkEbook);
         Task<List<LinkEbook>> GetsBySKU(ReadSKU[] obj);
+        Task<IEnumerable<LinkEbook>> CheckDuplicate(LinkEbook[] obj);
+        Task<IEnumerable<LinkEbook>> CheckDuplicateSKUButDisable(LinkEbook[] obj);
 
     }
 
@@ -93,6 +95,7 @@ namespace EbookWebAPI.DAL
                 throw new Exception($"{ex.Message}");
             }
         }
+        
         public async Task<LinkEbook[]> InsertMultiple(LinkEbook[] obj)
         {
             try
@@ -162,7 +165,7 @@ namespace EbookWebAPI.DAL
         {
             try
             {
-                List <LinkEbook> eBooks = new List<LinkEbook>();
+                List<LinkEbook> eBooks = new List<LinkEbook>();
                 foreach (var item in obj)
                 {
                     var result = await _context.LinkEbooks.FirstOrDefaultAsync(x => x.SKU == item.SKU && x.RowStatus == 0);
@@ -173,6 +176,40 @@ namespace EbookWebAPI.DAL
                     }
                 }
                 return eBooks;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<IEnumerable<LinkEbook>> CheckDuplicate(LinkEbook[] obj)
+        {
+            try
+            {
+                List<LinkEbook> emails = new List<LinkEbook>();
+                foreach (var item in obj)
+                {
+                    var result = await _context.LinkEbooks.FirstOrDefaultAsync(x => x.SKU == item.SKU);
+                    if (result != null) emails.Add(result);
+                }
+                return emails;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<IEnumerable<LinkEbook>> CheckDuplicateSKUButDisable(LinkEbook[] obj)
+        {
+            try
+            {
+                List<LinkEbook> emails = new List<LinkEbook>();
+                foreach (var item in obj)
+                {
+                    var result = await _context.LinkEbooks.FirstOrDefaultAsync(x => x.SKU == item.SKU && x.RowStatus == 1);
+                    if (result != null) emails.Add(result);
+                }
+                return emails;
             }
             catch (Exception ex)
             {

@@ -21,6 +21,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //Inject class DAL
 builder.Services.AddScoped<IEbook, EBookDAL>();
+builder.Services.AddScoped<IEMail,EmailDAL>();
 
 var app = builder.Build();
 
