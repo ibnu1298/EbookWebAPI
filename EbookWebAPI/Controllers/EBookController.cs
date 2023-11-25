@@ -184,6 +184,33 @@ namespace EbookWebAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("GetMultipleEBookByName")]
+        public async Task<ActionResult> GetMultipleLinkEbookByName(BookNameDTO obj)
+        {
+            ReadMultipleSKU getSKU = new ReadMultipleSKU();
+            try
+            {
+                var result = await _ebook.GetByName(obj.BookName);
+                if (result.Count() > 0)
+                {
+                    ebook.IsSucceeded = true;
+                    ebook.Message = $"Berhasil Mengambil {result.Count()} Link E-Book";
+                    ebook.EBooks = _mapper.Map<List<ReadEBookDTO>>(result);
+                }
+                else
+                {
+                    ebook.IsSucceeded = false;
+                    ebook.Message = $"Link E-Book Not Found";
+                    ebook.EBooks = null;
+                    return NotFound(ebook);
+                }
+                return Ok(ebook);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("Edit")]
         public async Task<ActionResult> EditEBook(AddEBookDTO obj)
         {

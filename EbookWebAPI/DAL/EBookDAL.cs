@@ -34,9 +34,18 @@ namespace EbookWebAPI.DAL
         {
             return null;
         }
-        public Task<IEnumerable<LinkEbook>> GetByName(string name)
+        public async Task<IEnumerable<LinkEbook>> GetByName(string name)
         {
-            return GetAll();
+            try
+            {
+                var result = await _context.LinkEbooks.Where(x => x.BookName.Contains(name)).ToListAsync();
+                if (result.Count <= 0) throw new Exception($"Error : Buku dengan nama {name} tidak ditemukan");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public Task<LinkEbook> GetById(int id)
         {

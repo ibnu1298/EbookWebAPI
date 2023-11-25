@@ -28,6 +28,10 @@ namespace EbookWebAPI.Dtos.Ebook
     {
         public int SKU { get; set; }
     }
+    public class BookNameDTO
+    {
+        public string BookName { get; set; }
+    }
     public class GetEBookBySKU
     {
         public int Id { get; set; }
