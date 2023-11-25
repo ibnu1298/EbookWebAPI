@@ -187,7 +187,6 @@ namespace EbookWebAPI.Controllers
         [HttpPost("GetMultipleEBookByName")]
         public async Task<ActionResult> GetMultipleLinkEbookByName(BookNameDTO obj)
         {
-            ReadMultipleSKU getSKU = new ReadMultipleSKU();
             try
             {
                 var result = await _ebook.GetByName(obj.BookName);
@@ -251,6 +250,32 @@ namespace EbookWebAPI.Controllers
                     return NotFound(ebook);
                 }
                 return Ok(ebook);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("Paging/{page}/{take}")]
+        public async Task<ActionResult> EbookPaging(BookNameDTO obj, int page, float take)
+        {
+            try
+            {
+                ReadMultipleEBookDTOPage readMultipleEBookDTOPage = new ReadMultipleEBookDTOPage();
+                var results = await _ebook.GetByName(obj.BookName);
+                if (_context.LinkEbooks == null)
+                    return NotFound();
+                var pageResults = take;
+                var pageCount = Math.Ceiling(_context.LinkEbooks.Count() / pageResults);
+                var ebooks = results.Skip((page - 1) * (int)pageResults)
+                    .Take((int)pageResults)
+                    .ToList();
+                readMultipleEBookDTOPage.Message = $"Berhasil Memngambil {results.Count()} Ebook";
+                readMultipleEBookDTOPage.IsSucceeded = true;
+                readMultipleEBookDTOPage.CurrentPage = page;
+                readMultipleEBookDTOPage.Pages = (int)pageCount;
+                readMultipleEBookDTOPage.EBooks = _mapper.Map<List<ReadEBookDTO>>(ebooks);
+                return Ok(readMultipleEBookDTOPage);
             }
             catch (Exception ex)
             {

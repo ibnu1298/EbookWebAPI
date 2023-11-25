@@ -6,6 +6,12 @@ namespace EbookWebAPI.Dtos.Ebook
     {
         public List<ReadEBookDTO> EBooks { get; set; }
     }
+    public class ReadMultipleEBookDTOPage : BaseResponse
+    {
+        public int Pages { get; set; }
+        public int CurrentPage { get; set; }
+        public List<ReadEBookDTO> EBooks { get; set; }
+    }
     public class ReadEBookDTO
     {
         public int Id { get; set; }
